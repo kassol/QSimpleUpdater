@@ -29,46 +29,80 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h2>
-<a name="qsimpleupdater" class="anchor" href="#qsimpleupdater"><span class="octicon octicon-link"></span></a>QSimpleUpdater</h2>
+<a id="qsimpleupdater" class="anchor" href="#qsimpleupdater" aria-hidden="true"><span class="octicon octicon-link"></span></a>QSimpleUpdater</h2>
+
+<p><a href="http://openhub.net/p/qsimpleupdater"><img src="https://www.openhub.net/p/qsimpleupdater/widgets/project_thin_badge.gif" alt="OpenHub"></a></p>
 
 <p>QSimpleUpdater is an implementation of an auto-updating system to be used with Qt projects. </p>
 
 <p>QSimpleUpdater is <strong>free and open source <a href="https://www.gnu.org/licenses/lgpl.html">LGPL software</a></strong>, which means that you can use it for both open source and proprietary applications.</p>
 
 <h2>
-<a name="using-qsimpleupdater" class="anchor" href="#using-qsimpleupdater"><span class="octicon octicon-link"></span></a>Using QSimpleUpdater</h2>
+<a id="using-qsimpleupdater" class="anchor" href="#using-qsimpleupdater" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using QSimpleUpdater</h2>
 
 <ol>
-<li>Copy the <code>QSimpleUpdater</code> folder in your "3rd-party" folder.</li>
+<li>Copy the <em>QSimpleUpdater</em> folder in your "3rd-party" folder.</li>
 <li>Include the QSimpleUpdater project include (pri) file using the include() function.</li>
 <li>That's all! Check the example project as a reference for your project.</li>
 </ol>
 
-<h4>
-<a name="running-the-example-project" class="anchor" href="#running-the-example-project"><span class="octicon octicon-link"></span></a>Running the example project</h4>
+<h2>
+<a id="running-the-example-project" class="anchor" href="#running-the-example-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the example project</h2>
 
 <ol>
-<li>Navigate to the <code>Example</code> folder and open <code>example.pro</code> with <a href="http://qt-project.org/wiki/Category:Tools::QtCreator">Qt Creator</a>.</li>
-<li>Compile the project and play with it <code>:)</code>
+<li>Navigate to the <em>Example</em> folder and open <em>example.pro</em> with <a href="http://qt-project.org/wiki/Category:Tools::QtCreator">Qt Creator</a>.</li>
+<li>Compile the project and play with it <em>:)</em>
 </li>
 </ol>
 
 <h2>
-<a name="donate" class="anchor" href="#donate"><span class="octicon octicon-link"></span></a>Donate</h2>
+<a id="warnings" class="anchor" href="#warnings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Warnings</h2>
+
+<p>Many websites today use the HTTPS protocol, which means that you will need SSL in order to communicate with them. If your project needs to access such a webiste (for example GitHub), you will need to carefully read the following information in order to ensure that QSimpleUpdater works with those websites (both in your machine and in the final users' machine).</p>
+
+<p>This section is extremely important for any developer wishing to deploy his or her applications under the Windows platform, because the application will depend on the libraries provided by QSimpleUpdater.</p>
+
+<h3>
+<a id="linux" class="anchor" href="#linux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Linux</h3>
+
+<p>Make sure that you have installed the following libraries in your system:</p>
+
+<ul>
+<li>lssl</li>
+<li>lcrypto</li>
+</ul>
+
+<h3>
+<a id="mac-os-x" class="anchor" href="#mac-os-x" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mac OS X</h3>
+
+<p>The libraries required by QSimpleUpdater are the same as Linux, however, these libraries are installed by default in most Mac OS X installations.</p>
+
+<h3>
+<a id="windows" class="anchor" href="#windows" aria-hidden="true"><span class="octicon octicon-link"></span></a>Windows</h3>
+
+<p>QSimpleUpdater makes use of the OpenSSL-Win32 project, make sure that have it installed and that the project knows where to find them (the default location is C:/OpenSSL-Win32) and that you deploy the following libraries with your compiled project:</p>
+
+<ul>
+<li>libeay32.dll</li>
+<li>ssleay32.dll</li>
+</ul>
+
+<h2>
+<a id="donate" class="anchor" href="#donate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Donate</h2>
 
 <p>Donate <a href="http://bitcoin.org">Bitcoins</a> to the project to keep it going!</p>
 
 <blockquote>
-<p>1BdxESMayJAengjAkjipMwfWkiqZUztyhU</p>
+<p>1FFz9TZCPGgiCD97yEqnFaauYYvZUE7f51 </p>
 </blockquote>
 
 <h2>
-<a name="useful-links" class="anchor" href="#useful-links"><span class="octicon octicon-link"></span></a>Useful Links</h2>
+<a id="useful-links" class="anchor" href="#useful-links" aria-hidden="true"><span class="octicon octicon-link"></span></a>Useful Links</h2>
 
 <ul>
-<li><a href="http://qsimpleupdater.sf.net">Project website</a></li>
-<li><a href="http://sf.net/p/qsimpleupdater">SourceForge Project</a></li>
+<li><a href="http://qsimpleupdater.sourceforge.net">Project website</a></li>
 <li><a href="http://openhub.net/p/qsimpleupdater">OpenHub Project</a></li>
+<li><a href="http://github.com/alex-97/qsimpleupdater">GitHub repository</a></li>
 <li><a href="mailto:alex.racotta@gmail.com">Contact developer</a></li>
 </ul>
         </section>
