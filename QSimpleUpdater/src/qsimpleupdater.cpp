@@ -280,7 +280,6 @@ void QSimpleUpdater::setChangelogUrl (const QString& url)
 
 void QSimpleUpdater::setApplicationVersion (const QString& version)
 {
-    Q_ASSERT (!version.isEmpty());
     m_installed_version = version;
 }
 
