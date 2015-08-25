@@ -2,7 +2,7 @@
 include($$PWD/../QSimpleUpdater/QSimpleUpdater.pri)
 
 # Include the QtWidgets module
-QT += widgets
+QT += widgets script
 
 # Define the source code
 FORMS += example.ui

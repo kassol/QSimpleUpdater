@@ -92,7 +92,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Downloading updates</string>
+            <string>下载更新</string>
            </property>
           </widget>
          </item>
@@ -109,13 +109,6 @@
            </property>
            <property name="invertedAppearance">
             <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="timeLabel">
-           <property name="text">
-            <string>Time remaining: 0 minutes</string>
            </property>
           </widget>
          </item>
@@ -156,14 +149,14 @@
       <item>
        <widget class="QPushButton" name="openButton">
         <property name="text">
-         <string>Open</string>
+         <string>打开</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="stopButton">
         <property name="text">
-         <string>Stop</string>
+         <string>停止</string>
         </property>
        </widget>
       </item>

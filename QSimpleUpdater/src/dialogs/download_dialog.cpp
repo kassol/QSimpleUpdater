@@ -17,6 +17,7 @@
 #include "ui_download_dialog.h"
 
 #include <QMutex>
+#include <QProcess>
 
 DownloadDialog::DownloadDialog (QWidget *parent)
     : QWidget (parent)
@@ -39,6 +40,7 @@ DownloadDialog::DownloadDialog (QWidget *parent)
     // Configure open button
     ui->openButton->setEnabled (false);
     ui->openButton->setVisible (false);
+    setWindowTitle(tr("软件更新"));
 
     // Initialize the network access manager
     m_manager = new QNetworkAccessManager (this);
@@ -53,25 +55,22 @@ DownloadDialog::~DownloadDialog (void)
     delete ui;
 }
 
-void DownloadDialog::beginDownload (const QUrl& url)
+void DownloadDialog::beginDownload (QList<QUrl>& download_urlList)
 {
-    Q_ASSERT (!url.isEmpty());
-
+    m_download_count = download_urlList.count();
+    m_download_urlList = download_urlList;
+    download_urlList.clear();
     // Reset the UI
-    ui->progressBar->setValue (0);
-    ui->stopButton->setText (tr ("Stop"));
-    ui->downloadLabel->setText (tr ("Downloading updates"));
-    ui->timeLabel->setText (tr ("Time remaining") + ": " + tr ("unknown"));
+    ui->progressBar->setMinimum(0);
+    ui->progressBar->setMaximum(m_download_count);
+    ui->progressBar->setValue (m_download_count-m_download_urlList.count());
+    ui->stopButton->setText (tr ("停止"));
+    ui->downloadLabel->setText (tr ("下载更新 %1/%2").arg(m_download_count-m_download_urlList.count()).arg(m_download_count));
 
     // Begin the download
-    m_reply = m_manager->get (QNetworkRequest (url));
-    m_start_time = QDateTime::currentDateTime().toTime_t();
+    m_reply = m_manager->get (QNetworkRequest (m_download_urlList.front()));
+    m_download_urlList.pop_front();
 
-    // Update the progress bar value automatically
-    connect (m_reply, SIGNAL (downloadProgress (qint64, qint64)), this,
-             SLOT (updateProgress (qint64, qint64)));
-
-    // Write the file to the hard disk once the download is finished
     connect (m_reply, SIGNAL (finished()), this, SLOT (downloadFinished()));
 
     // Show the dialog
@@ -83,31 +82,46 @@ void DownloadDialog::installUpdate (void)
     QMessageBox msg;
     msg.setIcon (QMessageBox::Question);
     msg.setText ("<b>" +
-                 tr ("To apply the update(s), you must first quit %1")
-                 .arg (qApp->applicationName()) +
-                 "</b>");
-    msg.setInformativeText (tr ("Do you want to quit %1 now?").arg (qApp->applicationName()));
+                 tr ("要进行更新您必须退出智能终端")+"</b>");
+    msg.setInformativeText (tr ("您想现在退出智能终端?"));
     msg.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
 
     if (msg.exec() == QMessageBox::Yes)
     {
-        openDownload();
-        qApp->closeAllWindows();
+        QProcess p;
+        p.start("taskkill /IM 1.exe /F");
+        p.waitForFinished();
+        p.start("taskkill /IM 2.exe /F");
+        p.waitForFinished();
+        copyFiles();
+        ui->downloadLabel->setText(tr("更新完成"));
     }
 
     else
     {
         ui->openButton->setEnabled (true);
         ui->openButton->setVisible (true);
-        ui->timeLabel->setText (tr ("Click the \"Open\" button to apply the update"));
+    }
+}
+
+void DownloadDialog::copyFiles(void)
+{
+    for (int i = 0; i < m_tmpFilePathList.count(); ++i)
+    {
+       QString filename = QDir::currentPath()+"/"+m_tmpFilePathList[i].right(m_tmpFilePathList[i].length()-m_tmpFilePathList[i].lastIndexOf('/')-1);
+       if(QFile::exists(filename))
+       {
+           QFile::remove(filename);
+           QFile::copy(m_tmpFilePathList[i], filename);
+       }
     }
 }
 
 void DownloadDialog::openDownload (void)
 {
-    if (!m_path.isEmpty())
+    if (!m_tmpFilePathList.isEmpty())
     {
-        QString url = m_path;
+        QString url;
 
         if (url.startsWith ("/"))
             url = "file://" + url;
@@ -124,10 +138,10 @@ void DownloadDialog::cancelDownload (void)
     if (!m_reply->isFinished())
     {
         QMessageBox _message;
-        _message.setWindowTitle (tr ("Updater"));
+        _message.setWindowTitle (tr ("更新"));
         _message.setIcon (QMessageBox::Question);
         _message.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-        _message.setText (tr ("Are you sure you want to cancel the download?"));
+        _message.setText (tr ("您确定要取消下载？"));
 
         if (_message.exec() == QMessageBox::Yes)
         {
@@ -142,10 +156,8 @@ void DownloadDialog::cancelDownload (void)
 
 void DownloadDialog::downloadFinished (void)
 {
-    ui->stopButton->setText (tr ("Close"));
-    ui->downloadLabel->setText (tr ("Download complete!"));
-    ui->timeLabel->setText (tr ("The installer will open in a separate window..."));
-
+    ui->downloadLabel->setText (tr ("下载更新 %1/%2").arg(m_download_count-m_download_urlList.count()).arg(m_download_count));
+    ui->progressBar->setValue (m_download_count-m_download_urlList.count());
     QByteArray data = m_reply->readAll();
 
     if (!data.isEmpty())
@@ -158,99 +170,25 @@ void DownloadDialog::downloadFinished (void)
         {
             _mutex.lock();
             file.write (data);
-            m_path = file.fileName();
+            m_tmpFilePathList.push_back(file.fileName());
             file.close();
             _mutex.unlock();
         }
 
-        installUpdate();
-    }
-}
-
-void DownloadDialog::updateProgress (qint64 received, qint64 total)
-{
-    // We know the size of the download, so we can calculate the progress....
-    if (total > 0 && received > 0)
-    {
-        ui->progressBar->setMinimum (0);
-        ui->progressBar->setMaximum (100);
-
-        int _progress = (int) ((received * 100) / total);
-        ui->progressBar->setValue (_progress);
-
-        QString _total_string;
-        QString _received_string;
-
-        float _total = total;
-        float _received = received;
-
-        if (_total < 1024)
-            _total_string = tr ("%1 bytes").arg (_total);
-
-        else if (_total < 1024 * 1024)
+        if (m_download_urlList.isEmpty())
         {
-            _total = roundNumber (_total / 1024);
-            _total_string = tr ("%1 KB").arg (_total);
+            ui->stopButton->setText (tr ("关闭"));
+            ui->downloadLabel->setText (tr ("下载完成！"));
+            installUpdate();
         }
-
         else
         {
-            _total = roundNumber (_total / (1024 * 1024));
-            _total_string = tr ("%1 MB").arg (_total);
+            ui->stopButton->setText (tr ("停止"));
+
+            m_reply = m_manager->get (QNetworkRequest (m_download_urlList.front()));
+            m_download_urlList.pop_front();
+            connect (m_reply, SIGNAL (finished()), this, SLOT (downloadFinished()));
         }
-
-        if (_received < 1024)
-            _received_string = tr ("%1 bytes").arg (_received);
-
-        else if (received < 1024 * 1024)
-        {
-            _received = roundNumber (_received / 1024);
-            _received_string = tr ("%1 KB").arg (_received);
-        }
-
-        else
-        {
-            _received = roundNumber (_received / (1024 * 1024));
-            _received_string = tr ("%1 MB").arg (_received);
-        }
-
-        ui->downloadLabel->setText (tr ("Downloading updates") + " (" + _received_string + " " + tr ("of") + " " + _total_string + ")");
-
-        uint _diff = QDateTime::currentDateTime().toTime_t() - m_start_time;
-
-        if (_diff > 0)
-        {
-            QString _time_string;
-            float _time_remaining = total / (received / _diff);
-
-            if (_time_remaining > 7200)
-            {
-                _time_remaining /= 3600;
-                _time_string = tr ("About %1 hours").arg (int (_time_remaining + 0.5));
-            }
-
-            else if (_time_remaining > 60)
-            {
-                _time_remaining /= 60;
-                _time_string = tr ("About %1 minutes").arg (int (_time_remaining + 0.5));
-            }
-
-            else if (_time_remaining <= 60)
-                _time_string = tr ("%1 seconds").arg (int (_time_remaining + 0.5));
-
-            ui->timeLabel->setText (tr ("Time remaining") + ": " + _time_string);
-        }
-    }
-
-    // We do not know the size of the download, so we avoid scaring the shit out
-    // of the user
-    else
-    {
-        ui->progressBar->setValue (-1);
-        ui->progressBar->setMinimum (0);
-        ui->progressBar->setMaximum (0);
-        ui->downloadLabel->setText (tr ("Downloading updates"));
-        ui->timeLabel->setText (tr ("Time remaining") + ": " + tr ("Unknown"));
     }
 }
 

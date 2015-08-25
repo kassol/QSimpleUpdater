@@ -39,21 +39,22 @@ class DownloadDialog : public QWidget
         explicit DownloadDialog (QWidget *parent = 0);
         ~DownloadDialog (void);
 
-        void beginDownload (const QUrl& url);
+        void beginDownload (QList<QUrl>& download_urlList);
 
     private slots:
         void openDownload (void);
+        void copyFiles(void);
         void installUpdate (void);
         void cancelDownload (void);
         void downloadFinished (void);
-        void updateProgress (qint64 received, qint64 total);
         void ignoreSslErrors (QNetworkReply *reply, const QList<QSslError>& error);
 
     private:
         Ui::DownloadDialog *ui;
-
-        QString m_path;
         bool m_download_paused;
+        int m_download_count;
+        QList<QUrl> m_download_urlList;
+        QList<QString> m_tmpFilePathList;
 
         QNetworkReply *m_reply;
         QNetworkAccessManager *m_manager;

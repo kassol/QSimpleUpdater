@@ -7,78 +7,34 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>120</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>QSimpleUpdater Example</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QLabel" name="versionLabel">
      <property name="text">
-      <string>Set installed version (latest version is 1.0)</string>
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../QSimpleUpdater/res/qsu_resources.qrc">:/icons/update.png</pixmap>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="versionLineEdit">
-     <property name="placeholderText">
-      <string>0.1 (default)</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="changelogLabel">
+    <widget class="QPushButton" name="updatesButton">
      <property name="text">
-      <string>Changelog of latest version</string>
+      <string>Check for updates</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPlainTextEdit" name="changelogTextEdit">
-     <property name="font">
-      <font>
-       <family>Courier</family>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="undoRedoEnabled">
-      <bool>false</bool>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="backgroundVisible">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="closeButton">
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="updatesButton">
-        <property name="text">
-         <string>Check for updates</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../QSimpleUpdater/res/qsu_resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

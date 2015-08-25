@@ -27,6 +27,7 @@ ProgressDialog::ProgressDialog (QWidget *parent) : QDialog (parent), ui (new Ui:
     setWindowFlags (Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 
     // Close dialog when cancel button is clicked
+    setWindowTitle(tr("Èí¼þ¸üÐÂ"));
     connect (ui->ui_cancel_button, SIGNAL (clicked()), this, SLOT (cancel()));
 }
 
