@@ -12,78 +12,9 @@
  * Lesser General Public License for more details.
  */
 
-/*! \class QSimpleUpdater
- * \brief A simple auto-updater system for Qt
- *
- * QSimpleUpdater is an implementation of an auto-updating system to be used with Qt projects.
- * Aside from notifying you if there's a newer version, it allows you to download the change log in any
- * format (such as HTML or RTF) and download the updates directly from your application using a dialog.
- * QSimpleUpdater is free and open source LGPL software,
- * which means that you can use it for both open source and proprietary applications.
- *
- * \chapter Installation
- *
- * \list
- * \o Copy the QSimpleUpdater folder in your "3rd-party" folder.
- * \o Include the QSimpleUpdater project include (pri) file using the include() function.
- * \o That's all! Check the example project as a reference for your project.
- * \endlist
- *
- * \chapter Running the example project
- *
- * \list
- * \o Navigate to the Example folder and open example.pro with Qt Creator.
- * \o Compile the project and play with it :)
- * \endlist
- *
- * \chapter Warnings
- * Many websites today use the HTTP Secure protocol, which means that you will need SSL
- * in order to communicate with them.
- * If your project needs to access such a webiste (for example GitHub),
- * you will need to carefully read the following information in order to ensure that
- * QSimpleUpdater works with those websites (both in your machine and in the final users' machine).
- *
- * This section is extremely important for any developers wishing to deploy their applications under
- * the Windows platform, because the application will depend on the OpenSSL libaries in order to work.
- *
- * \bold {Linux}
- *
- * Make sure that you have installed the following libraries in your system:
- *
- * \list
- * \o lssl
- * \o lcrypto
- * \endlist
- *
- * \bold {Mac OS X}
- *
- * The libraries required by QSimpleUpdater are the same as Linux, however, these libraries
- * are installed by default in most Mac OS X installations.
- *
- * \bold {Microsoft Windows}
- *
- * QSimpleUpdater makes use of the OpenSSL-Win32 project, make sure that have it installed
- * and that the project knows where to find them (the default location is C:/OpenSSL-Win32).
- * Finally, deploy the following libraries with your compiled project:
- *
- * \list
- * \o libeay32.dll
- * \o ssleay32.dll
- * \endlist
- */
-
-/*! \fn QSimpleUpdater::checkingFinished (void)
- * This signal is triggered when the updater system finishes downloading
- * and proccessing the version data and changelog data.
- */
-
 #include "qsimpleupdater.h"
 #include <QtScript/QScriptEngine>
 #include <Qtscript/qscriptvalueiterator.h>
-
-/*! \internal
- * Initializes and configures the class.
- */
 
 QSimpleUpdater::QSimpleUpdater (QObject *parent)
     : QObject (parent)
@@ -103,22 +34,19 @@ QSimpleUpdater::QSimpleUpdater (QObject *parent)
 
     connect (m_progressDialog, SIGNAL (cancelClicked()), this, SLOT (cancel()));
     connect (this, SIGNAL (checkingFinished()), this, SLOT (onCheckingFinished()));
-
-    //setApplicationVersion (qApp->applicationVersion());
 }
-
-/*!
- * Checks for updates and calls the appropiate functions
- * when finished.
- *
- * \sa setDownloadUrl(), setReferenceUrl()
- */
 
 void QSimpleUpdater::checkForUpdates (void)
 {
-    QFile file("/Users/kassol/Workspace/QSimpleUpdater/version.txt");
+    QFile file(QCoreApplication::applicationDirPath()+"/version.txt");
     if (!file.open(QIODevice::ReadOnly))
     {
+        QMessageBox _message;
+        _message.setWindowTitle (tr ("错误"));
+        _message.setIcon (QMessageBox::Critical);
+        _message.setStandardButtons (QMessageBox::Ok);
+        _message.setText(tr("找不到版本文件!"));
+        _message.exec();
         return;
     }
     QTextStream in(&file);
@@ -139,86 +67,33 @@ void QSimpleUpdater::checkForUpdates (void)
         qDebug() << "QSimpleUpdater: Invalid reference URL";
 }
 
-/*!
- * Returns the latest version as a \c QString.
- *
- * \sa setReferenceUrl(), checkForUpdates()
- */
-
 QString QSimpleUpdater::latestVersion() const
 {
     return m_latest_version;
 }
 
-/*!
- * Returns the local version of the application.
- *
- * \sa setApplicationVersion()
- */
 
 QString QSimpleUpdater::installedVersion() const
 {
     return m_installed_version;
 }
 
-/*!
- * Downloads the latest version of the application
- * and displays download info in a dialog.
- *
- * \sa setDownloadUrl(), checkForUpdates()
- */
-
 void QSimpleUpdater::downloadLatestVersion (void)
 {
     if (!m_download_urlList.isEmpty())
-        m_downloadDialog->beginDownload (m_download_urlList);
+        m_downloadDialog->beginDownload (m_download_urlList, m_latest_version);
 }
-
-/*!
- * Returns \c true if the system detected that there is
- * a newer version of the application available online.
- *
- * \sa setReferenceUrl(), checkForUpdates()
- */
 
 bool QSimpleUpdater::newerVersionAvailable() const
 {
     return m_new_version_available;
 }
 
-/*!
- * Tells the updater system from where to download the file
- * that indicates the latest version using the \a url parameter.
- *
- * The reference file should contain \bold {ONLY} the latest version
- * in a plain text format. For example:
- *
- * \list
- * \o 1
- * \o 0.1
- * \o 1.0.1
- * \o 2.2.12
- * \o etc
- * \endlist
- *
- * \sa latestVersion()
- */
-
 void QSimpleUpdater::setReferenceUrl (const QString& url)
 {
     Q_ASSERT (!url.isEmpty());
     m_reference_url.setUrl (url);
 }
-
-/*!
- * Tells the updater system from where to download the
- * change log using the \a url parameter.
- * The change log can be any file you like, however,
- * its recommended to write it in plain text,
- * such as TXT, HTML and RTF files.
- *
- * \sa changeLog()
- */
 
 
 void QSimpleUpdater::setChangelogUrl (const QString& url)
@@ -227,50 +102,20 @@ void QSimpleUpdater::setChangelogUrl (const QString& url)
     m_changelog_url.setUrl (url);
 }
 
-/*!
- * Tells the updater the version of the installed
- * copy of your application using the \a version parameter.
- *
- * Calling this function is optional, as the default
- * values are loaded from QApplication class.
- *
- * \sa installedVersion(), checkForUpdates()
- */
-
-
 void QSimpleUpdater::setApplicationVersion (const QString& version)
 {
     m_installed_version = version;
 }
-
-/*!
- * If the \a show parameter is set to \c true, the updater system will show a
- * message box notifying the user when there's an update available.
- *
- * \sa checkForUpdates()
- */
 
 void QSimpleUpdater::setShowUpdateAvailableMessage (bool show)
 {
     m_show_update_available = show;
 }
 
-/*! \internal
- * Disconnects the network access manager when the user
- * clicks on the "cancel" button in the progress dialog.
- */
-
 void QSimpleUpdater::cancel (void)
 {
     m_manager->disconnect();
 }
-
-/*! \internal
- * Alerts the user when the download of version information
- * data is corrupted.
- *
- * \sa checkDownloadedVersion()
- */
 
 void QSimpleUpdater::showErrorMessage (void)
 {
@@ -280,36 +125,23 @@ void QSimpleUpdater::showErrorMessage (void)
                               tr ("检查更新是出现未知错误！"));
 }
 
-/*! \internal
- * Informs the user if there's a newer version available for download
- * or if he or she is running the latest version of the application.
- *
- * \sa checkDownloadedVersion()
- */
-
 void QSimpleUpdater::onCheckingFinished (void)
 {
-    // Hide the progress dialog
     m_progressDialog->hide();
 
-    // Get the application icon as a pixmap
     QPixmap _icon = qApp->windowIcon().pixmap (
                         qApp->windowIcon().actualSize (QSize (96, 96)));
-
-    // If the icon is invalid, use default icon
     if (_icon.isNull())
         _icon = QPixmap (":/icons/update.png");
 
     QMessageBox _message;
     _message.setIconPixmap (_icon);
 
-    // Ask user if he/she wants to download newer version
     if (newerVersionAvailable() && m_show_update_available)
     {
         _message.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-        _message.setText ("<b>" + tr ("%1 有新版本可用！").arg (qApp->applicationName()) + "</b>");
-        _message.setInformativeText (tr ("%1 %2 可用 - 您的版本是 %3. 确定现在下载？")
-                                     .arg (qApp->applicationName())
+        _message.setText ("<b>" + tr ("有新版本可用！") + "</b>");
+        _message.setInformativeText (tr ("%1 可用 - 您的版本是 %2. 确定现在下载？")
                                      .arg (latestVersion())
                                      .arg (installedVersion()));
 
@@ -317,30 +149,18 @@ void QSimpleUpdater::onCheckingFinished (void)
             downloadLatestVersion();
     }
 
-    // Tell user that he/she is up to date (only if necessary)
     else if (!m_latest_version.isEmpty())
     {
         _message.setStandardButtons (QMessageBox::Ok);
         _message.setText ("<b>" + tr ("您的版本已经是最新！") +
                           "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>");
         _message.setInformativeText (
-            tr ("%1 %2 是目前最新的版本")
-            .arg (qApp->applicationName())
+            tr ("您的程序是目前最新的版本%1")
             .arg (installedVersion()));
 
         _message.exec();
     }
 }
-
-/*! \internal
- * Compares downloaded version information with local version information
- * and decides if there's a newer version available.
- *
- * Finally, the function downloads the changelog if there's a newer version
- * available online.
- *
- * \sa checkForUpdates()
- */
 
 void QSimpleUpdater::checkDownloadedVersion (QNetworkReply *reply)
 {
@@ -417,24 +237,12 @@ void QSimpleUpdater::checkDownloadedVersion (QNetworkReply *reply)
         emit checkingFinished();
 }
 
-/*! \internal
- * Reads the downloaded changelog data and transforms it into a QString.
- *
- * \sa setChangelogUrl(), changeLog()
- */
-
 void QSimpleUpdater::processDownloadedChangelog (QNetworkReply *reply)
 {
     QString _reply = QString::fromUtf8 (reply->readAll());
 
     emit checkingFinished();
 }
-
-/*! \internal
- * Allows the download process to continue even if there are SSL errors.
- *
- * \sa checkForUpdates()
- */
 
 void QSimpleUpdater::ignoreSslErrors (QNetworkReply *reply,
                                       const QList<QSslError>& error)

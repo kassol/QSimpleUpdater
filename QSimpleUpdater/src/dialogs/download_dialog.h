@@ -39,11 +39,12 @@ class DownloadDialog : public QWidget
         explicit DownloadDialog (QWidget *parent = 0);
         ~DownloadDialog (void);
 
-        void beginDownload (QList<QUrl>& download_urlList);
+        void beginDownload (QList<QUrl>& download_urlList, QString newVersion);
 
     private slots:
         void openDownload (void);
-        void copyFiles(void);
+        bool copyFiles(void);
+        void updateVersion(void);
         void installUpdate (void);
         void cancelDownload (void);
         void downloadFinished (void);
@@ -55,6 +56,7 @@ class DownloadDialog : public QWidget
         int m_download_count;
         QList<QUrl> m_download_urlList;
         QList<QString> m_tmpFilePathList;
+        QString m_latest_version;
 
         QNetworkReply *m_reply;
         QNetworkAccessManager *m_manager;

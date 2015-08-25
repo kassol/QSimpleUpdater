@@ -18,5 +18,5 @@
 
 # Other
 .DS_Store
-build-example-unknown_3c8914-Debug
+build-*
 *.user

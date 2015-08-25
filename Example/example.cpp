@@ -45,8 +45,8 @@ Example::~Example()
 
 void Example::checkForUpdates()
 {
-    ui->updatesButton->setEnabled (false);
-    ui->updatesButton->setText ("检查更新...");
+    //ui->updatesButton->setEnabled (false);
+    //ui->updatesButton->setText ("检查更新...");
 
     updater->setReferenceUrl ("http://96.126.103.128:3000/update");
 

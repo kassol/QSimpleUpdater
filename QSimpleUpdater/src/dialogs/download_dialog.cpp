@@ -18,9 +18,11 @@
 
 #include <QMutex>
 #include <QProcess>
+#include <QTextStream>
 
 DownloadDialog::DownloadDialog (QWidget *parent)
     : QWidget (parent)
+    , m_latest_version("")
     , ui (new Ui::DownloadDialog)
 {
 
@@ -55,8 +57,9 @@ DownloadDialog::~DownloadDialog (void)
     delete ui;
 }
 
-void DownloadDialog::beginDownload (QList<QUrl>& download_urlList)
+void DownloadDialog::beginDownload (QList<QUrl>& download_urlList, QString newVersion)
 {
+    m_latest_version = newVersion;
     m_download_count = download_urlList.count();
     m_download_urlList = download_urlList;
     download_urlList.clear();
@@ -93,8 +96,15 @@ void DownloadDialog::installUpdate (void)
         p.waitForFinished();
         p.start("taskkill /IM 2.exe /F");
         p.waitForFinished();
-        copyFiles();
-        ui->downloadLabel->setText(tr("更新完成"));
+        if(copyFiles())
+        {
+            ui->downloadLabel->setText(tr("更新完成"));
+        }
+        else
+        {
+            ui->downloadLabel->setText(tr("复制文件失败，请关闭所有程序后把updatefile文件夹里的文件复制到上层文件夹中。"));
+        }
+        updateVersion();
     }
 
     else
@@ -104,17 +114,40 @@ void DownloadDialog::installUpdate (void)
     }
 }
 
-void DownloadDialog::copyFiles(void)
+bool DownloadDialog::copyFiles(void)
 {
+    bool success = true;
     for (int i = 0; i < m_tmpFilePathList.count(); ++i)
     {
-       QString filename = QDir::currentPath()+"/"+m_tmpFilePathList[i].right(m_tmpFilePathList[i].length()-m_tmpFilePathList[i].lastIndexOf('/')-1);
+       QString filename = QCoreApplication::applicationDirPath()+"/"+m_tmpFilePathList[i].right(m_tmpFilePathList[i].length()-m_tmpFilePathList[i].lastIndexOf('/')-1);
        if(QFile::exists(filename))
        {
            QFile::remove(filename);
-           QFile::copy(m_tmpFilePathList[i], filename);
+       }
+       if(!QFile::copy(m_tmpFilePathList[i], filename))
+       {
+           success = false;
        }
     }
+    return success;
+}
+
+void DownloadDialog::updateVersion(void)
+{
+    QFile file(QCoreApplication::applicationDirPath()+"/version.txt");
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        QMessageBox _message;
+        _message.setWindowTitle(("错误"));
+        _message.setIcon (QMessageBox::Critical);
+        _message.setStandardButtons (QMessageBox::Ok);
+        _message.setText(tr("找不到版本文件!"));
+        _message.exec();
+        return;
+    }
+    QTextStream out(&file);
+    out << "version=" <<m_latest_version;
+    file.close();
 }
 
 void DownloadDialog::openDownload (void)
@@ -163,7 +196,12 @@ void DownloadDialog::downloadFinished (void)
     if (!data.isEmpty())
     {
         QStringList list = m_reply->url().toString().split ("/");
-        QFile file (QDir::tempPath() + "/" + list.at (list.count() - 1));
+        QDir dir;
+        if (!dir.exists(QCoreApplication::applicationDirPath()+"/updatefile/"))
+        {
+            dir.mkdir(QCoreApplication::applicationDirPath()+"/updatefile/");
+        }
+        QFile file (QCoreApplication::applicationDirPath()+"/updatefile/"+list.at (list.count() - 1));
         QMutex _mutex;
 
         if (file.open (QIODevice::WriteOnly))
