@@ -19,7 +19,6 @@
 QSimpleUpdater::QSimpleUpdater (QObject *parent)
     : QObject (parent)
     , m_download_count(0)
-    , m_show_update_available (true)
     , m_new_version_available (false)
 {
 
@@ -29,8 +28,6 @@ QSimpleUpdater::QSimpleUpdater (QObject *parent)
     m_manager = new QNetworkAccessManager (this);
     connect (m_manager, SIGNAL (finished (QNetworkReply *)), this,
              SLOT (checkDownloadedVersion (QNetworkReply *)));
-    connect (m_manager, SIGNAL (sslErrors (QNetworkReply *, QList<QSslError>)),
-             this, SLOT (ignoreSslErrors (QNetworkReply *, QList<QSslError>)));
 
     connect (m_progressDialog, SIGNAL (cancelClicked()), this, SLOT (cancel()));
     connect (this, SIGNAL (checkingFinished()), this, SLOT (onCheckingFinished()));
@@ -95,23 +92,6 @@ void QSimpleUpdater::setReferenceUrl (const QString& url)
     m_reference_url.setUrl (url);
 }
 
-
-void QSimpleUpdater::setChangelogUrl (const QString& url)
-{
-    Q_ASSERT (!url.isEmpty());
-    m_changelog_url.setUrl (url);
-}
-
-void QSimpleUpdater::setApplicationVersion (const QString& version)
-{
-    m_installed_version = version;
-}
-
-void QSimpleUpdater::setShowUpdateAvailableMessage (bool show)
-{
-    m_show_update_available = show;
-}
-
 void QSimpleUpdater::cancel (void)
 {
     m_manager->disconnect();
@@ -137,7 +117,7 @@ void QSimpleUpdater::onCheckingFinished (void)
     QMessageBox _message;
     _message.setIconPixmap (_icon);
 
-    if (newerVersionAvailable() && m_show_update_available)
+    if (newerVersionAvailable())
     {
         _message.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
         _message.setText ("<b>" + tr ("有新版本可用！") + "</b>");
@@ -220,37 +200,5 @@ void QSimpleUpdater::checkDownloadedVersion (QNetworkReply *reply)
 
     m_new_version_available = _new_update;
 
-    if (!m_changelog_url.isEmpty() && newerVersionAvailable())
-    {
-        QNetworkAccessManager *_manager = new QNetworkAccessManager (this);
-
-        connect (_manager, SIGNAL (finished (QNetworkReply *)), this,
-                 SLOT (processDownloadedChangelog (QNetworkReply *)));
-
-        connect (_manager, SIGNAL (sslErrors (QNetworkReply *, QList<QSslError>)),
-                 this, SLOT (ignoreSslErrors (QNetworkReply *, QList<QSslError>)));
-
-        _manager->get (QNetworkRequest (m_changelog_url));
-    }
-
-    else
-        emit checkingFinished();
-}
-
-void QSimpleUpdater::processDownloadedChangelog (QNetworkReply *reply)
-{
-    QString _reply = QString::fromUtf8 (reply->readAll());
-
     emit checkingFinished();
-}
-
-void QSimpleUpdater::ignoreSslErrors (QNetworkReply *reply,
-                                      const QList<QSslError>& error)
-{
-#if SUPPORTS_SSL
-    reply->ignoreSslErrors (error);
-#else
-    Q_UNUSED (reply);
-    Q_UNUSED (error);
-#endif
 }

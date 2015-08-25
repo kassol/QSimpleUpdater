@@ -48,9 +48,6 @@ class QSimpleUpdater : public QObject
 
     public slots:
         void setReferenceUrl (const QString& url);
-        void setChangelogUrl (const QString& url);
-        void setShowUpdateAvailableMessage (bool show);
-        void setApplicationVersion (const QString& version);
 
     signals:
         void checkingFinished (void);
@@ -64,8 +61,6 @@ class QSimpleUpdater : public QObject
         QString installedVersion() const;
         bool newerVersionAvailable() const;
         void checkDownloadedVersion (QNetworkReply *reply);
-        void processDownloadedChangelog (QNetworkReply *reply);
-        void ignoreSslErrors (QNetworkReply *reply, const QList<QSslError>& error);
 
     private:
         QString m_latest_version;
@@ -75,9 +70,7 @@ class QSimpleUpdater : public QObject
         QList<QUrl> m_download_urlList;
         int m_download_count;
         QUrl m_reference_url;
-        QUrl m_changelog_url;
 
-        bool m_show_update_available;
         bool m_new_version_available;
 
         DownloadDialog *m_downloadDialog;

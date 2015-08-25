@@ -15,8 +15,13 @@ int main (int argc, char *argv[])
 
 
     // Create the dialog and show it
-    Example example;
-    example.show();
+   // Example example;
+    //example.show();
+
+    QSimpleUpdater *updater = new QSimpleUpdater();
+    updater->setReferenceUrl ("http://96.126.103.128:3000/update");
+
+    updater->checkForUpdates();
 
     // Run the app
     return app.exec();
@@ -32,10 +37,6 @@ Example::Example (QWidget *parent) : QDialog (parent), ui (new Ui::Example)
     updater = new QSimpleUpdater (this);
     setWindowTitle(tr("更新程序"));
     ui->updatesButton->setText ("检查更新");
-
-    // When the updater finishes checking for updates, show a message box
-    // and show the change log of the latest version
-    connect (updater, SIGNAL (checkingFinished()), this, SLOT (onCheckingFinished()));
 }
 
 Example::~Example()
@@ -53,10 +54,3 @@ void Example::checkForUpdates()
     updater->checkForUpdates();
 }
 
-void Example::onCheckingFinished()
-{
-    // Enable the updatesButton and change its text to let the user know
-    // that he/she can check for updates again
-    ui->updatesButton->setEnabled (true);
-    ui->updatesButton->setText ("检查更新");
-}

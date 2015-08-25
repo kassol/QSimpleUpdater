@@ -23,11 +23,11 @@ OTHER_FILES += $$PWD/src/QSimpleUpdater
 INCLUDEPATH += $$PWD/src
 
 unix:!android {
-    LIBS += -lcrypto -lssl
+    #LIBS += -lcrypto -lssl
 }
 
 win32* {
-    LIBS += -LC:/OpenSSL-Win32/lib -llibeay32
+    #LIBS += -LC:/OpenSSL-Win32/lib -llibeay32
 }
 
 RESOURCES += $$PWD/res/qsu_resources.qrc
