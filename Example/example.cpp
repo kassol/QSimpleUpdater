@@ -15,13 +15,13 @@ int main (int argc, char *argv[])
 
 
     // Create the dialog and show it
-   // Example example;
-    //example.show();
+    Example example;
+    example.show();
 
-    QSimpleUpdater *updater = new QSimpleUpdater();
-    updater->setReferenceUrl ("http://96.126.103.128:3000/update");
+//    QSimpleUpdater *updater = new QSimpleUpdater();
+//    updater->setReferenceUrl ("http://96.126.103.128:3000/update");
 
-    updater->checkForUpdates();
+//    updater->checkForUpdates(true);
 
     // Run the app
     return app.exec();

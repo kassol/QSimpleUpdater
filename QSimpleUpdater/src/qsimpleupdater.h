@@ -43,7 +43,7 @@ class QSimpleUpdater : public QObject
 
     public:
         QSimpleUpdater (QObject *parent = 0);
-        void checkForUpdates (void);
+        void checkForUpdates (bool silent = false);
 
 
     public slots:
@@ -63,6 +63,7 @@ class QSimpleUpdater : public QObject
         void checkDownloadedVersion (QNetworkReply *reply);
 
     private:
+        bool m_silent;
         QString m_latest_version;
         QString m_installed_version;
         QNetworkAccessManager *m_manager;

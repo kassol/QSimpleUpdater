@@ -19,6 +19,7 @@
 QSimpleUpdater::QSimpleUpdater (QObject *parent)
     : QObject (parent)
     , m_download_count(0)
+    , m_silent(false)
     , m_new_version_available (false)
 {
 
@@ -33,8 +34,9 @@ QSimpleUpdater::QSimpleUpdater (QObject *parent)
     connect (this, SIGNAL (checkingFinished()), this, SLOT (onCheckingFinished()));
 }
 
-void QSimpleUpdater::checkForUpdates (void)
+void QSimpleUpdater::checkForUpdates (bool silent)
 {
+    m_silent = silent;
     QFile file(QCoreApplication::applicationDirPath()+"/version.txt");
     if (!file.open(QIODevice::ReadOnly))
     {
@@ -57,7 +59,10 @@ void QSimpleUpdater::checkForUpdates (void)
     {
         m_manager->get (QNetworkRequest (m_reference_url));
 
-        m_progressDialog->show();
+        if (!m_silent)
+        {
+            m_progressDialog->show();
+        }
     }
 
     else
@@ -129,7 +134,7 @@ void QSimpleUpdater::onCheckingFinished (void)
             downloadLatestVersion();
     }
 
-    else if (!m_latest_version.isEmpty())
+    else if (!m_latest_version.isEmpty() && !m_silent)
     {
         _message.setStandardButtons (QMessageBox::Ok);
         _message.setText ("<b>" + tr ("您的版本已经是最新！") +
