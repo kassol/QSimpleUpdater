@@ -48,7 +48,6 @@ class DownloadDialog : public QWidget
         void installUpdate (void);
         void cancelDownload (void);
         void downloadFinished (void);
-        void ignoreSslErrors (QNetworkReply *reply, const QList<QSslError>& error);
 
     private:
         Ui::DownloadDialog *ui;

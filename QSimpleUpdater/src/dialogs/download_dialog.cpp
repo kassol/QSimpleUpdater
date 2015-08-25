@@ -26,30 +26,21 @@ DownloadDialog::DownloadDialog (QWidget *parent)
     , ui (new Ui::DownloadDialog)
 {
 
-    // Setup the UI
     ui->setupUi (this);
 
-    // Make the window look like a dialog
     QIcon _blank;
     setWindowIcon (_blank);
     setWindowModality (Qt::WindowModal);
     setWindowFlags (Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 
-    // Connect SIGNALS/SLOTS
     connect (ui->stopButton, SIGNAL (clicked()), this, SLOT (cancelDownload()));
     connect (ui->openButton, SIGNAL (clicked()), this, SLOT (installUpdate()));
 
-    // Configure open button
     ui->openButton->setEnabled (false);
     ui->openButton->setVisible (false);
     setWindowTitle(tr("软件更新"));
 
-    // Initialize the network access manager
     m_manager = new QNetworkAccessManager (this);
-
-    // Avoid SSL issues
-    connect (m_manager, SIGNAL (sslErrors (QNetworkReply *, QList<QSslError>)), this,
-             SLOT (ignoreSslErrors (QNetworkReply *, QList<QSslError>)));
 }
 
 DownloadDialog::~DownloadDialog (void)
@@ -63,20 +54,19 @@ void DownloadDialog::beginDownload (QList<QUrl>& download_urlList, QString newVe
     m_download_count = download_urlList.count();
     m_download_urlList = download_urlList;
     download_urlList.clear();
-    // Reset the UI
+
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(m_download_count);
     ui->progressBar->setValue (m_download_count-m_download_urlList.count());
     ui->stopButton->setText (tr ("停止"));
     ui->downloadLabel->setText (tr ("下载更新 %1/%2").arg(m_download_count-m_download_urlList.count()).arg(m_download_count));
 
-    // Begin the download
+
     m_reply = m_manager->get (QNetworkRequest (m_download_urlList.front()));
     m_download_urlList.pop_front();
 
     connect (m_reply, SIGNAL (finished()), this, SLOT (downloadFinished()));
 
-    // Show the dialog
     showNormal();
 }
 
@@ -228,20 +218,4 @@ void DownloadDialog::downloadFinished (void)
             connect (m_reply, SIGNAL (finished()), this, SLOT (downloadFinished()));
         }
     }
-}
-
-void DownloadDialog::ignoreSslErrors (QNetworkReply *reply,
-                                      const QList<QSslError>& error)
-{
-#ifndef Q_OS_IOS
-    reply->ignoreSslErrors (error);
-#else
-    Q_UNUSED (reply);
-    Q_UNUSED (error);
-#endif
-}
-
-float DownloadDialog::roundNumber (const float& input)
-{
-    return roundf (input * 100) / 100;
 }

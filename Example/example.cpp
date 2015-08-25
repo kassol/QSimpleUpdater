@@ -13,8 +13,6 @@ int main (int argc, char *argv[])
     app.setApplicationVersion(QObject::tr("1.0"));
     app.setApplicationName ("更新程序");
 
-
-    // Create the dialog and show it
     Example example;
     example.show();
 
@@ -23,17 +21,14 @@ int main (int argc, char *argv[])
 
 //    updater->checkForUpdates(true);
 
-    // Run the app
     return app.exec();
 }
 
 Example::Example (QWidget *parent) : QDialog (parent), ui (new Ui::Example)
 {
-    // Create and configure the user interface
     ui->setupUi (this);
     connect (ui->updatesButton, SIGNAL (clicked()), this, SLOT (checkForUpdates()));
 
-    // Initialize the updater
     updater = new QSimpleUpdater (this);
     setWindowTitle(tr("更新程序"));
     ui->updatesButton->setText ("检查更新");
