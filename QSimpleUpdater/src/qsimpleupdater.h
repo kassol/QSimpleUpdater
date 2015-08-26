@@ -55,7 +55,6 @@ class QSimpleUpdater : public QObject
 
     private slots:
         void cancel (void);
-        void showErrorMessage (void);
         void onCheckingFinished (void);
         void downloadLatestVersion (void);
         QString latestVersion() const;

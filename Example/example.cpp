@@ -27,8 +27,8 @@ int main (int argc, char *argv[])
 Example::Example (QWidget *parent) : QDialog (parent), ui (new Ui::Example)
 {
     ui->setupUi (this);
-    connect (ui->updatesButton, SIGNAL (clicked()), this, SLOT (checkForUpdates()));
-
+    connect(ui->updatesButton, SIGNAL(clicked()), this, SLOT(checkForUpdates()));
+    connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(cancel()));
     updater = new QSimpleUpdater (this);
     setWindowTitle(tr("更新程序"));
     ui->updatesButton->setText ("检查更新");
@@ -48,6 +48,17 @@ void Example::checkForUpdates()
     updater->setReferenceUrl ("http://96.126.103.128:3000/update");
     connect(updater, SIGNAL(downloadFinished(bool)), this, SLOT(downloadFinished(bool)));
     updater->checkForUpdates();
+}
+
+void Example::cancel()
+{
+    if (true)
+    {
+        QApplication::quit();
+    }
+    else
+    {
+    }
 }
 
 void Example::downloadFinished(bool success)

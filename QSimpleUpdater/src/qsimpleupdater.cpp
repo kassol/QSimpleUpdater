@@ -27,8 +27,6 @@ QSimpleUpdater::QSimpleUpdater (QObject *parent)
     m_downloadDialog = new DownloadDialog();
 
     m_manager = new QNetworkAccessManager (this);
-    connect (m_manager, SIGNAL (finished (QNetworkReply *)), this,
-             SLOT (checkDownloadedVersion (QNetworkReply *)));
 
     connect (m_progressDialog, SIGNAL (cancelClicked()), this, SLOT (cancel()));
     connect (this, SIGNAL (checkingFinished()), this, SLOT (onCheckingFinished()));
@@ -57,6 +55,8 @@ void QSimpleUpdater::checkForUpdates (bool silent)
 
     if (!m_reference_url.isEmpty())
     {
+        connect (m_manager, SIGNAL (finished (QNetworkReply *)), this,
+                 SLOT (checkDownloadedVersion (QNetworkReply *)));
         m_manager->get (QNetworkRequest (m_reference_url));
 
         if (!m_silent)
@@ -108,14 +108,6 @@ void QSimpleUpdater::setReferenceUrl (const QString& url)
 void QSimpleUpdater::cancel (void)
 {
     m_manager->disconnect();
-}
-
-void QSimpleUpdater::showErrorMessage (void)
-{
-
-    m_progressDialog->hide();
-    QMessageBox::warning (NULL, tr ("软件更新"),
-                              tr ("检查更新是出现未知错误！"));
 }
 
 void QSimpleUpdater::onCheckingFinished (void)
@@ -207,9 +199,6 @@ void QSimpleUpdater::checkDownloadedVersion (QNetworkReply *reply)
             }
         }
     }
-
-    else
-        showErrorMessage();
 
     m_new_version_available = _new_update;
 
