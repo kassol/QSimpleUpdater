@@ -24,12 +24,15 @@ class Example : public QDialog
         void downloadFinished(bool success);
         void checkingFinished();
 
+        void timerEvent( QTimerEvent *event );
+
     private:
         Ui::Example *ui;
 
         QString m_installed_version;
         QSimpleUpdater *updater;
         bool m_isCheckingUpdate;
+        int m_timeID;
 };
 
 #endif

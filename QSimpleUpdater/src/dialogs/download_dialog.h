@@ -43,6 +43,7 @@ class DownloadDialog : public QWidget
 
     signals:
         void finished(bool);
+        void cancelClicked(void);
     private slots:
         void openDownload (void);
         bool copyFiles(void);

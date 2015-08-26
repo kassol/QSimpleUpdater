@@ -35,7 +35,6 @@
 #endif
 
 #include "dialogs/download_dialog.h"
-#include "dialogs/progress_dialog.h"
 
 class QSimpleUpdater : public QObject
 {
@@ -52,6 +51,7 @@ class QSimpleUpdater : public QObject
 
     signals:
         void checkingFinished (void);
+        void checkingFinishedForUpdate(void);
         void downloadFinished(bool);
 
     private slots:

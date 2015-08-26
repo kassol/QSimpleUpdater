@@ -25,7 +25,8 @@ QSimpleUpdater::QSimpleUpdater (QObject *parent)
     m_downloadDialog = new DownloadDialog();
 
     m_manager = new QNetworkAccessManager (this);
-    connect (this, SIGNAL (checkingFinished()), this, SLOT (onCheckingFinished()));
+    connect(this, SIGNAL (checkingFinished()), this, SLOT (onCheckingFinished()));
+    connect(m_downloadDialog, SIGNAL(cancelClicked()), this, SIGNAL(checkingFinishedForUpdate()));
 }
 
 void QSimpleUpdater::checkForUpdates (bool silent)
@@ -121,9 +122,14 @@ void QSimpleUpdater::onCheckingFinished (void)
                                      .arg (installedVersion()));
 
         if (_message.exec() == QMessageBox::Yes)
+        {
             downloadLatestVersion();
+        }
+        else
+        {
+            emit checkingFinishedForUpdate();
+        }
     }
-
     else if (!m_latest_version.isEmpty() && !m_silent)
     {
         _message.setStandardButtons (QMessageBox::Ok);
@@ -134,6 +140,11 @@ void QSimpleUpdater::onCheckingFinished (void)
             .arg (installedVersion()));
 
         _message.exec();
+        emit checkingFinishedForUpdate();
+    }
+    else
+    {
+        emit checkingFinishedForUpdate();
     }
 }
 
