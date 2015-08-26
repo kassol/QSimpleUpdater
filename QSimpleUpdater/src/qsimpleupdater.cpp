@@ -22,13 +22,9 @@ QSimpleUpdater::QSimpleUpdater (QObject *parent)
     , m_silent(false)
     , m_new_version_available (false)
 {
-
-    m_progressDialog = new ProgressDialog();
     m_downloadDialog = new DownloadDialog();
 
     m_manager = new QNetworkAccessManager (this);
-
-    connect (m_progressDialog, SIGNAL (cancelClicked()), this, SLOT (cancel()));
     connect (this, SIGNAL (checkingFinished()), this, SLOT (onCheckingFinished()));
 }
 
@@ -58,11 +54,6 @@ void QSimpleUpdater::checkForUpdates (bool silent)
         connect (m_manager, SIGNAL (finished (QNetworkReply *)), this,
                  SLOT (checkDownloadedVersion (QNetworkReply *)));
         m_manager->get (QNetworkRequest (m_reference_url));
-
-        if (!m_silent)
-        {
-            m_progressDialog->show();
-        }
     }
 
     else
@@ -108,12 +99,11 @@ void QSimpleUpdater::setReferenceUrl (const QString& url)
 void QSimpleUpdater::cancel (void)
 {
     m_manager->disconnect();
+    emit checkingFinished();
 }
 
 void QSimpleUpdater::onCheckingFinished (void)
 {
-    m_progressDialog->hide();
-
     QPixmap _icon = qApp->windowIcon().pixmap (
                         qApp->windowIcon().actualSize (QSize (96, 96)));
     if (_icon.isNull())
@@ -159,6 +149,7 @@ void QSimpleUpdater::checkDownloadedVersion (QNetworkReply *reply)
     m_download_count = result.property("Itemscount").toInteger();
     QScriptValue items = result.property("Items");
     QScriptValueIterator it(items);
+    m_download_urlList.clear();
     for (int i = 0; i< m_download_count; ++i)
     {
         it.next();

@@ -24,7 +24,10 @@ int main (int argc, char *argv[])
     return app.exec();
 }
 
-Example::Example (QWidget *parent) : QDialog (parent), ui (new Ui::Example)
+Example::Example (QWidget *parent) :
+    QDialog (parent),
+    ui (new Ui::Example),
+    m_isCheckingUpdate(false)
 {
     ui->setupUi (this);
     connect(ui->updatesButton, SIGNAL(clicked()), this, SLOT(checkForUpdates()));
@@ -42,23 +45,33 @@ Example::~Example()
 
 void Example::checkForUpdates()
 {
-    //ui->updatesButton->setEnabled (false);
-    //ui->updatesButton->setText ("检查更新...");
+    ui->updatesButton->setEnabled (false);
+    ui->updatesButton->setText ("正在检查更新...");
     ui->label->setText(tr(""));
     updater->setReferenceUrl ("http://96.126.103.128:3000/update");
     connect(updater, SIGNAL(downloadFinished(bool)), this, SLOT(downloadFinished(bool)));
+    connect(updater, SIGNAL(checkingFinished()), this, SLOT(checkingFinished()));
+    m_isCheckingUpdate = true;
     updater->checkForUpdates();
 }
 
 void Example::cancel()
 {
-    if (true)
+    if (!m_isCheckingUpdate)
     {
         QApplication::quit();
     }
     else
     {
+        updater->cancel();
     }
+}
+
+void Example::checkingFinished()
+{
+    ui->updatesButton->setEnabled (true);
+    ui->updatesButton->setText ("检查更新");
+    m_isCheckingUpdate = false;
 }
 
 void Example::downloadFinished(bool success)

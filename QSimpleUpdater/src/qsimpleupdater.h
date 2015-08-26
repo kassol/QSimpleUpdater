@@ -48,13 +48,13 @@ class QSimpleUpdater : public QObject
 
     public slots:
         void setReferenceUrl (const QString& url);
+        void cancel (void);
 
     signals:
         void checkingFinished (void);
         void downloadFinished(bool);
 
     private slots:
-        void cancel (void);
         void onCheckingFinished (void);
         void downloadLatestVersion (void);
         QString latestVersion() const;
@@ -76,7 +76,6 @@ class QSimpleUpdater : public QObject
         bool m_new_version_available;
 
         DownloadDialog *m_downloadDialog;
-        ProgressDialog *m_progressDialog;
 };
 
 #endif

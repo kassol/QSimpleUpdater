@@ -22,12 +22,14 @@ class Example : public QDialog
         void checkForUpdates();
         void cancel();
         void downloadFinished(bool success);
+        void checkingFinished();
 
     private:
         Ui::Example *ui;
 
         QString m_installed_version;
         QSimpleUpdater *updater;
+        bool m_isCheckingUpdate;
 };
 
 #endif
