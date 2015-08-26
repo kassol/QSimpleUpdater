@@ -20,6 +20,7 @@ class Example : public QDialog
 
     public slots:
         void checkForUpdates();
+        void downloadFinished(bool success);
 
     private:
         Ui::Example *ui;

@@ -32,6 +32,7 @@ Example::Example (QWidget *parent) : QDialog (parent), ui (new Ui::Example)
     updater = new QSimpleUpdater (this);
     setWindowTitle(tr("更新程序"));
     ui->updatesButton->setText ("检查更新");
+    ui->label->setText(tr(""));
 }
 
 Example::~Example()
@@ -43,9 +44,21 @@ void Example::checkForUpdates()
 {
     //ui->updatesButton->setEnabled (false);
     //ui->updatesButton->setText ("检查更新...");
-
+    ui->label->setText(tr(""));
     updater->setReferenceUrl ("http://96.126.103.128:3000/update");
-
+    connect(updater, SIGNAL(downloadFinished(bool)), this, SLOT(downloadFinished(bool)));
     updater->checkForUpdates();
+}
+
+void Example::downloadFinished(bool success)
+{
+    if (success)
+    {
+        ui->label->setText(tr("更新完成"));
+    }
+    else
+    {
+        ui->label->setText(tr("复制文件失败，请关闭所有程序后把updatefile文件夹里的文件复制到上层文件夹中。"));
+    }
 }
 

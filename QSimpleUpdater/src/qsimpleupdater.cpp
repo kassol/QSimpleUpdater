@@ -83,7 +83,15 @@ QString QSimpleUpdater::installedVersion() const
 void QSimpleUpdater::downloadLatestVersion (void)
 {
     if (!m_download_urlList.isEmpty())
+    {
+        connect(m_downloadDialog, SIGNAL(finished(bool)), this, SLOT(finished(bool)));
         m_downloadDialog->beginDownload (m_download_urlList, m_latest_version);
+    }
+}
+
+void QSimpleUpdater::finished(bool success)
+{
+    emit downloadFinished(success);
 }
 
 bool QSimpleUpdater::newerVersionAvailable() const

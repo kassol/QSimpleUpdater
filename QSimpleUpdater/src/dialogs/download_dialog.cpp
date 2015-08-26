@@ -88,11 +88,15 @@ void DownloadDialog::installUpdate (void)
         p.waitForFinished();
         if(copyFiles())
         {
+            emit finished(true);
             ui->downloadLabel->setText(tr("更新完成"));
+            close();
         }
         else
         {
+            emit finished(false);
             ui->downloadLabel->setText(tr("复制文件失败，请关闭所有程序后把updatefile文件夹里的文件复制到上层文件夹中。"));
+            close();
         }
         updateVersion();
     }

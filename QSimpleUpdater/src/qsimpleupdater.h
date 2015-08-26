@@ -51,6 +51,7 @@ class QSimpleUpdater : public QObject
 
     signals:
         void checkingFinished (void);
+        void downloadFinished(bool);
 
     private slots:
         void cancel (void);
@@ -61,6 +62,7 @@ class QSimpleUpdater : public QObject
         QString installedVersion() const;
         bool newerVersionAvailable() const;
         void checkDownloadedVersion (QNetworkReply *reply);
+        void finished(bool success);
 
     private:
         bool m_silent;

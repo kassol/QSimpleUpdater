@@ -41,6 +41,8 @@ class DownloadDialog : public QWidget
 
         void beginDownload (QList<QUrl>& download_urlList, QString newVersion);
 
+    signals:
+        void finished(bool);
     private slots:
         void openDownload (void);
         bool copyFiles(void);
