@@ -58,7 +58,7 @@ void Example::downloadFinished(bool success)
     }
     else
     {
-        ui->label->setText(tr("复制文件失败，请关闭所有程序后把updatefile文件夹里的文件复制到上层文件夹中。"));
+        ui->label->setText(tr("复制文件失败，请关闭所有程序后\n把updatefile文件夹里的文件复制到\n上层文件夹中。"));
     }
 }
 
